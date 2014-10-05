@@ -219,26 +219,17 @@ var PowerSaveHandler = (function PowerSaveHandler() {
           section: 'battery'
         }
       });
+      hidePowerSavingNotification();
     };
 
-    var closePowersaveNotification = function() {
-      _powerSaveNotification = null;
-    };
-
-    var powerSavingNotification = new Notification(
+    _powerSaveNotification = new Notification(
       _('notification-powersaving-mode-on-title'),
       {
         body: _('notification-powersaving-mode-on-description'),
         icon: 'style/icons/Power_saving_mode.png'
       }
     );
-    powerSavingNotification.addEventListener('click', clickCB);
-    powerSavingNotification.addEventListener(
-      'close',
-      closePowersaveNotification
-    );
-
-    _powerSaveNotification = powerSavingNotification;
+    _powerSaveNotification.addEventListener('click', clickCB);
   }
 
   function hidePowerSavingNotification() {
@@ -247,6 +238,7 @@ var PowerSaveHandler = (function PowerSaveHandler() {
     }
 
     _powerSaveNotification.close();
+    _powerSaveNotification = null;
   }
 
   function onBatteryChange() {
@@ -287,9 +279,7 @@ var PowerSaveHandler = (function PowerSaveHandler() {
 
   return {
     init: init,
-    onBatteryChange: onBatteryChange,
-    showPowerSavingNotification: showPowerSavingNotification,
-    hidePowerSavingNotification: hidePowerSavingNotification
+    onBatteryChange: onBatteryChange
   };
 })();
 

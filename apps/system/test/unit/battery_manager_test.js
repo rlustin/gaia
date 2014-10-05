@@ -221,53 +221,57 @@ suite('battery manager >', function() {
 
     suite('battery goes empty with powersave enabled>', function() {
       var notificationSpy;
-      var notificationListenerSpy;
-      var showNotificationSpy;
-      var hideNotificationSpy;
+      // var notificationListenerSpy;
+      // var showNotificationSpy;
+      // var hideNotificationSpy;
 
-      setup(function() {
-        this.sinon.useFakeTimers();
+      suiteSetup(function() {
+        // this.sinon.useFakeTimers();
         SettingsListener.getSettingsLock().set({'powersave.enabled': true});
-        notificationListenerSpy = this.sinon.spy('');
+        // notificationListenerSpy = this.sinon.spy('');
 
-        notificationSpy = this.sinon.stub(window, 'Notification').returns({
-          addEventListener: notificationListenerSpy,
-          close: function() {}
-        });
+        // notificationSpy = this.sinon.stub(window, 'Notification').returns({
+        //   addEventListener: notificationListenerSpy,
+        //   close: function() {}
+        // });
 
-        showNotificationSpy = this.sinon.spy(
-          PowerSaveHandler,
-          'showPowerSavingNotification'
-        );
-        hideNotificationSpy = this.sinon.spy(
-          PowerSaveHandler,
-          'hidePowerSavingNotification'
-        );
+        // showNotificationSpy = this.sinon.spy(
+        //   PowerSaveHandler,
+        //   'showPowerSavingNotification'
+        // );
+        // hideNotificationSpy = this.sinon.spy(
+        //   PowerSaveHandler,
+        //   'hidePowerSavingNotification'
+        // );
+        notificationSpy = sinon.spy(window, 'Notification');
+      });
+
+      suiteTeardown(function() {
+        notificationSpy.restore();
       });
 
       test('below threshold with powersave enabled', function() {
+        var title = 'notification-powersaving-mode-on-title';
         sendLevelChange(0.05);
         MockSettingsListener.mTriggerCallback('powersave.threshold', 0.1);
-        this.sinon.clock.tick(100);
-        sinon.assert.calledOnce(showNotificationSpy);
-        this.sinon.clock.tick(100);
-        sinon.assert.notCalled(hideNotificationSpy);
+        sinon.assert.callCount(notificationSpy, 1);
+        sinon.assert.calledWith(notificationSpy, title);
+        // this.sinon.clock.tick(100);
+        // sinon.assert.calledOnce(showNotificationSpy);
+        // this.sinon.clock.tick(100);
+        // sinon.assert.notCalled(hideNotificationSpy);
       });
 
       test('above threshold with powersave enabled', function() {
         sendLevelChange(1);
         MockSettingsListener.mTriggerCallback('powersave.threshold', 0.1);
-        this.sinon.clock.tick(100);
-        sinon.assert.notCalled(showNotificationSpy);
-        this.sinon.clock.tick(100);
-        sinon.assert.calledOnce(hideNotificationSpy);
+        sinon.assert.callCount(notificationSpy, 1);
+        // this.sinon.clock.tick(100);
+        // sinon.assert.notCalled(showNotificationSpy);
+        // this.sinon.clock.tick(100);
+        // sinon.assert.calledOnce(hideNotificationSpy);
       });
 
-      test('showNotification should create a notification',
-        function() {
-          PowerSaveHandler.showNotification();
-          sinon.assert.calledOnce(notificationSpy);
-      });
     });
   });
 });
